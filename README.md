@@ -7,6 +7,7 @@ reproduce the error without having to spin up a separate server.
 To start:
 
 ```
+yarn
 yarn dev
 ```
 

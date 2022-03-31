@@ -1,5 +1,6 @@
 import React from 'react'
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 import worker from './mocks/browser';
 import './App.css'
 

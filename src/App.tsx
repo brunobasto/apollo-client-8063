@@ -4,22 +4,21 @@ import gql from 'graphql-tag';
 import worker from './mocks/browser';
 import './App.css'
 
-const GET_USERS = gql`
-  query getUsers {
-    users {
-      __typename
-      id
-      name
-    }
-  }
-`
-
-const GET_SPECIFIC_USER = gql`
-  query getSpecificUser($id: String!) {
-    user(id: $id) {
-      __typename
-      id
-      name
+const GET_SUBSITE_DOMAIN_STATUS = gql`
+  query GetSubsiteDomainStatus( $id: Int! ) {
+    jobs {
+      type
+      completedAt
+      createdAt
+      inProgressLock
+      progress {
+        status
+        steps {
+          name
+          step
+          status
+        }
+      }
     }
   }
 `
@@ -29,25 +28,25 @@ worker.start();
 worker.printHandlers();
 
 function App() {
-  const { loading: loadingAll, error: errorAll, data: dataAll } = useQuery(GET_USERS);
-  const { loading: loadingSpecific, error: errorSpecific, data: dataSpecific } = useQuery(GET_SPECIFIC_USER, {
+  const {
+    loading: isLoading,
+    error: hasErrors,
+    data: data
+  } = useQuery( GET_SUBSITE_DOMAIN_STATUS, {
+		fetchPolicy: 'no-cache',
+		pollInterval: 1000,
+		returnPartialData: true,
+    errorPolicy: 'all',
     variables: { id: 'b' },
-    /**
-     * Uncomment the below to magically fix the cache bug!
-     */
-    // fetchPolicy: 'no-cache'
-  });
+  } );
 
-  if (errorAll || errorSpecific || loadingAll || loadingSpecific) {
+  if ( hasErrors || isLoading ) {
     return null;
   }
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>User B from GET_USERS: {JSON.stringify(dataAll.users[1])}</p>
-        <p>User B from GET_SPECIFIC_USER: {JSON.stringify(dataSpecific ? dataSpecific : 'undefined')}</p>
-      </header>
+    <div className="App" style={ { padding: '20px' } }>
+      <pre style={ { textAlign: 'left' } }>Response: { data ? JSON.stringify( data, null, 1 ) : 'undefined' }</pre>
     </div>
   )
 }
